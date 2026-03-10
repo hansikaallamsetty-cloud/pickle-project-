@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Cart – Pickles & Snacks{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1>Your Cart</h1>
+  <p>{{ cart_items|length }} item{% if cart_items|length != 1 %}s{% endif %} in your basket</p>
+</div>
+
+{% if cart_items %}
+<div class="cart-layout">
+
+  <!-- ── CART ITEMS ───────────────────────────────────────── -->
+  <div class="cart-items-col">
+    {% for item in cart_items %}
+    <div class="cart-row">
+      <img src="{{ url_for('static', filename='images/' + item.img) }}"
+           alt="{{ item.name }}" class="cart-img"
+           onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'"/>
+      <div class="cart-row-info">
+        <h3>{{ item.name }}</h3>
+        <span class="cart-category">{{ item.category }}</span>
+        <span class="cart-unit-price">₹{{ item.price }} each</span>
+      </div>
+      <form method="POST" action="{{ url_for('update_cart', pid=item.id) }}" class="cart-qty-form">
+        <div class="qty-wrap small">
+          <button type="button" onclick="adjQty(this, -1)">−</button>
+          <input type="number" name="qty" value="{{ item.qty }}" min="0" max="{{ item.stock }}"
+                 onchange="this.form.submit()"/>
+          <button type="button" onclick="adjQty(this, 1)">+</button>
+        </div>
+      </form>
+      <div class="cart-subtotal">₹{{ item.subtotal }}</div>
+      <a href="{{ url_for('remove_from_cart', pid=item.id) }}" class="cart-remove" title="Remove">✕</a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- ── ORDER SUMMARY ────────────────────────────────────── -->
+  <div class="cart-summary-col">
+    <div class="cart-summary">
+      <h3>Order Summary</h3>
+      <div class="summary-row">
+        <span>Subtotal</span><span>₹{{ total }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Delivery</span><span class="free-text">Free</span>
+      </div>
+      <div class="summary-row total-row">
+        <strong>Total</strong><strong>₹{{ total }}</strong>
+      </div>
+      <a href="{{ url_for('checkout') }}" class="btn btn-primary btn-block btn-lg">Proceed to Checkout →</a>
+      <a href="{{ url_for('products') }}" class="btn btn-outline btn-block" style="margin-top:0.5rem">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── RECOMMENDATIONS ───────────────────────────────────── -->
+{% if recommendations %}
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">🤝 Customers Also Bought</h2>
+    <p class="section-subtitle">Complete your order with these great picks</p>
+  </div>
+  <div class="product-grid">
+    {% for p in recommendations %}
+    <div class="product-card">
+      <a href="{{ url_for('product_detail', pid=p.id) }}" class="card-img-wrap">
+        <img src="{{ url_for('static', filename='images/' + p.img) }}"
+             alt="{{ p.name }}" class="card-img"
+             onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'"/>
+        <span class="card-category">{{ p.category }}</span>
+      </a>
+      <div class="card-body">
+        <h3 class="card-name">{{ p.name }}</h3>
+        <p class="card-desc">{{ p.short }}</p>
+        <div class="card-meta">
+          <span class="card-price">₹{{ p.price }}</span>
+          <span class="card-weight">{{ p.weight }}</span>
+        </div>
+        <form method="POST" action="{{ url_for('add_to_cart', pid=p.id) }}">
+          <input type="hidden" name="qty" value="1"/>
+          <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% else %}
+<!-- Empty cart state -->
+<div class="empty-state large">
+  <span>🛒</span>
+  <h2>Your cart is empty</h2>
+  <p>Add some delicious pickles and snacks to get started!</p>
+  <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">Browse Products</a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function adjQty(btn, delta) {
+    const form = btn.closest('form');
+    const input = form.querySelector('input[name="qty"]');
+    const max = parseInt(input.max) || 99;
+    input.value = Math.max(0, Math.min(max, parseInt(input.value) + delta));
+    form.submit();
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Homemade Pickles & Snacks{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- ── NAVBAR ──────────────────────────────────────────── -->
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="nav-brand">
+    <span class="brand-icon">🥒</span>
+    <span class="brand-text">Pickle<span class="brand-accent">&</span>Snacks</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
+    <li><a href="{{ url_for('products') }}" class="nav-link {% if request.endpoint == 'products' %}active{% endif %}">Products</a></li>
+    <li>
+      <a href="{{ url_for('cart') }}" class="nav-link cart-link {% if request.endpoint == 'cart' %}active{% endif %}">
+        Cart
+        {% if cart_count > 0 %}
+        <span class="cart-badge">{{ cart_count }}</span>
+        {% endif %}
+      </a>
+    </li>
+    {% if current_user %}
+    <li class="nav-user">
+      <span class="nav-user-name">Hi, {{ current_user.name.split()[0] }}!</span>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline btn-sm">Logout</a>
+    </li>
+    {% else %}
+    <li><a href="{{ url_for('login') }}" class="btn btn-primary btn-sm">Login</a></li>
+    {% endif %}
+  </ul>
+
+  <button class="nav-toggle" id="navToggle">☰</button>
+</nav>
+
+<!-- ── FLASH MESSAGES ───────────────────────────────────── -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+  <div class="flash-container">
+    {% for cat, msg in messages %}
+    <div class="flash flash-{{ cat }}">
+      <span>{{ msg }}</span>
+      <button onclick="this.parentElement.remove()">✕</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endwith %}
+
+<!-- ── MAIN CONTENT ─────────────────────────────────────── -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ── FOOTER ───────────────────────────────────────────── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-icon">🥒</span>
+      <span class="footer-brand-name">Homemade Pickles & Snacks</span>
+      <p class="footer-tagline">Taste the Best — Made with love &amp; tradition</p>
+    </div>
+    <div class="footer-links">
+      <a href="{{ url_for('products') }}?category=pickles">Pickles</a>
+      <a href="{{ url_for('products') }}?category=snacks">Snacks</a>
+      <a href="{{ url_for('cart') }}">Cart</a>
+      {% if current_user %}<a href="{{ url_for('logout') }}">Logout</a>
+      {% else %}<a href="{{ url_for('login') }}">Login</a>{% endif %}
+    </div>
+    <p class="footer-copy">© 2025 Homemade Pickles & Snacks. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // Mobile nav toggle
+  document.getElementById('navToggle').addEventListener('click', () => {
+    document.querySelector('.nav-links').classList.toggle('open');
+  });
+  // Auto-dismiss flash messages
+  setTimeout(() => {
+    document.querySelectorAll('.flash').forEach(el => el.style.opacity = '0');
+  }, 4000);
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

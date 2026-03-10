@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Homemade Pickles & Snacks – Taste the Best{% endblock %}
+
+{% block content %}
+
+<!-- ── HERO ───────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg-pattern"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">🏡 Homemade &amp; Handcrafted</span>
+    <h1 class="hero-title">
+      Bold Flavours.<br/>
+      <em>Real Tradition.</em>
+    </h1>
+    <p class="hero-sub">
+      Sun-dried pickles and crispy snacks made from heirloom recipes —
+      no preservatives, no shortcuts. Just pure homemade taste.
+    </p>
+    <div class="hero-cta">
+      <a href="{{ url_for('products') }}" class="btn btn-primary btn-lg">Shop Now</a>
+      <a href="{{ url_for('products') }}?category=pickles" class="btn btn-outline btn-lg">Explore Pickles</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><strong>12+</strong><span>Recipes</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><strong>100%</strong><span>Natural</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><strong>4.8★</strong><span>Avg Rating</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-jar jar-1">🫙</div>
+    <div class="hero-jar jar-2">🫙</div>
+    <div class="hero-jar jar-3">🫙</div>
+    <div class="hero-float-badge">New Batch<br/>Fresh Today</div>
+  </div>
+</section>
+
+<!-- ── CATEGORIES STRIP ──────────────────────────────────── -->
+<section class="categories-strip">
+  <a href="{{ url_for('products') }}?category=pickles" class="cat-card">
+    <span class="cat-emoji">🥒</span>
+    <h3>Pickles</h3>
+    <p>Mango · Lemon · Garlic & more</p>
+    <span class="cat-arrow">→</span>
+  </a>
+  <a href="{{ url_for('products') }}?category=snacks" class="cat-card">
+    <span class="cat-emoji">🍿</span>
+    <h3>Snacks</h3>
+    <p>Murukku · Chips · Mixture & more</p>
+    <span class="cat-arrow">→</span>
+  </a>
+  <a href="#subscriptions" class="cat-card">
+    <span class="cat-emoji">📦</span>
+    <h3>Subscriptions</h3>
+    <p>Monthly boxes delivered to you</p>
+    <span class="cat-arrow">→</span>
+  </a>
+</section>
+
+<!-- ── FEATURED PRODUCTS ─────────────────────────────────── -->
+<section class="section">
+  <div class="section-header">
+    <h2 class="section-title">Featured Picks</h2>
+    <a href="{{ url_for('products') }}" class="section-link">View All →</a>
+  </div>
+  <div class="product-grid">
+    {% for p in featured %}
+    <div class="product-card">
+      <a href="{{ url_for('product_detail', pid=p.id) }}" class="card-img-wrap">
+        <img src="{{ url_for('static', filename='images/' + p.img) }}"
+             alt="{{ p.name }}" class="card-img"
+             onerror="this.src='{{ url_for('static', filename='images/placeholder.png') }}'"/>
+        <span class="card-category">{{ p.category }}</span>
+      </a>
+      <div class="card-body">
+        <h3 class="card-name">{{ p.name }}</h3>
+        <p class="card-desc">{{ p.short }}</p>
+        <div class="card-meta">
+          <span class="card-price">₹{{ p.price }}</span>
+          <span class="card-weight">{{ p.weight }}</span>
+        </div>
+        <div class="card-stock {% if p.stock < 10 %}low-stock{% endif %}">
+          {% if p.stock > 0 %}{{ p.stock }} in stock{% else %}Out of stock{% endif %}
+        </div>
+        {% if p.stock > 0 %}
+        <form method="POST" action="{{ url_for('add_to_cart', pid=p.id) }}">
+          <input type="hidden" name="qty" value="1"/>
+          <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>
+        </form>
+        {% else %}
+        <button class="btn btn-disabled btn-block" disabled>Out of Stock</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- ── WHY US ─────────────────────────────────────────────── -->
+<section class="why-us section">
+  <div class="section-header">
+    <h2 class="section-title">Why Choose Us?</h2>
+  </div>
+  <div class="why-grid">
+    <div class="why-card">
+      <span class="why-icon">🌿</span>
+      <h4>100% Natural</h4>
+      <p>No artificial colours, flavours, or preservatives — ever.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">👩‍🍳</span>
+      <h4>Handcrafted</h4>
+      <p>Made in small batches by family recipes passed down generations.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">🚚</span>
+      <h4>Fast Delivery</h4>
+      <p>Packed fresh and shipped within 24 hours of your order.</p>
+    </div>
+    <div class="why-card">
+      <span class="why-icon">❤️</span>
+      <h4>Made with Love</h4>
+      <p>Every jar is sealed with care for the perfect taste experience.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── SUBSCRIPTIONS ─────────────────────────────────────── -->
+<section class="section subscriptions" id="subscriptions">
+  <div class="section-header">
+    <h2 class="section-title">Subscription Plans</h2>
+    <p class="section-subtitle">Never run out of your favourite flavours.</p>
+  </div>
+  <div class="sub-grid">
+
+    <div class="sub-card">
+      <div class="sub-badge">Most Popular</div>
+      <span class="sub-icon">🥒</span>
+      <h3>Monthly Pickle Box</h3>
+      <div class="sub-price">₹499 <span>/month</span></div>
+      <ul class="sub-features">
+        <li>✔ 4 jars of seasonal pickles</li>
+        <li>✔ Free delivery</li>
+        <li>✔ New flavour every month</li>
+        <li>✔ Cancel anytime</li>
+      </ul>
+      {% if current_user %}
+      <form method="POST" action="{{ url_for('subscribe') }}">
+        <input type="hidden" name="plan" value="Monthly Pickle Box"/>
+        <button type="submit" class="btn btn-primary btn-block">Subscribe Now</button>
+      </form>
+      {% else %}
+      <a href="{{ url_for('login') }}" class="btn btn-primary btn-block">Login to Subscribe</a>
+      {% endif %}
+    </div>
+
+    <div class="sub-card">
+      <span class="sub-icon">🍿</span>
+      <h3>Weekly Snack Box</h3>
+      <div class="sub-price">₹299 <span>/week</span></div>
+      <ul class="sub-features">
+        <li>✔ 3 packs of fresh snacks</li>
+        <li>✔ Free delivery</li>
+        <li>✔ Curated weekly selection</li>
+        <li>✔ Cancel anytime</li>
+      </ul>
+      {% if current_user %}
+      <form method="POST" action="{{ url_for('subscribe') }}">
+        <input type="hidden" name="plan" value="Weekly Snack Box"/>
+        <button type="submit" class="btn btn-outline btn-block">Subscribe Now</button>
+      </form>
+      {% else %}
+      <a href="{{ url_for('login') }}" class="btn btn-outline btn-block">Login to Subscribe</a>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
